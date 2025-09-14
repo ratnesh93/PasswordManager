@@ -10,12 +10,12 @@
     "scripting"
   ],
   
-  "optional_permissions": [
-    "activeTab"
+  "host_permissions": [
+    "<all_urls>"
   ],
   
-  "optional_host_permissions": [
-    "<all_urls>"
+  "optional_permissions": [
+    "activeTab"
   ],
   
   "background": {

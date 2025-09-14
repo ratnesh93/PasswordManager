@@ -50,12 +50,13 @@ A secure local password manager Chrome extension with Gmail authentication and e
 ## Requirements Covered
 
 This basic structure addresses all requirements by providing:
-- Gmail authentication framework (Requirements 1, 2)
-- Credential storage interface (Requirement 3)
-- Context menu integration (Requirements 4, 5)
-- Import/export framework (Requirements 6, 7)
-- Encryption service foundation (Requirement 8)
-- Local storage for offline use (Requirement 9)
+- Credential storage interface 
+- Context menu integration
+- Import/export framework 
+- Encryption service foundation
+- Local storage for offline use 
+- Autofill feature
+- Save to Password manager feature from website login page
 
 ## Next Steps
 

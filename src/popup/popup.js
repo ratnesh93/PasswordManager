@@ -2799,29 +2799,40 @@ class PopupController {
             button.disabled = true;
             button.textContent = 'Requesting...';
 
-            const response = await chrome.runtime.sendMessage({
-                type: 'REQUEST_AUTOFILL_PERMISSIONS'
-            });
+            try {
+                const granted = await new Promise((resolve) => {
+                chrome.permissions.request({
+                    permissions: ['activeTab', 'scripting'],
+                    origins: ['<all_urls>', '*://*.example.com/*'] // adjust to your needed origins
+                }, (granted) => {
+                    if (chrome.runtime.lastError) {
+                        console.error('Permission request error:', chrome.runtime.lastError);
+                        resolve(false);
+                        return;
+                    }
+                    resolve(granted);
+                    });
+                    });
 
-            if (response && response.success) {
-                if (response.data.granted) {
+                if (granted) {
                     this.showTemporaryMessage('Autofill permissions granted! You can now use right-click autofill.');
                     this.refreshPermissionStatus();
                 } else {
                     this.showError('Autofill permissions were denied. Some features may not work properly.');
                 }
-            } else {
-                this.showError('Failed to request permissions: ' + (response?.error || 'Unknown error'));
-            }
-        } catch (error) {
-            console.error('Error requesting autofill permissions:', error);
-            this.showError('Failed to request permissions');
-        } finally {
-            const button = document.getElementById('request-autofill');
-            button.disabled = false;
-            button.textContent = 'Enable';
-        }
+                } catch (err) {
+                    console.error('Error requesting permissions:', err);
+                    this.showError('Failed to request permissions');
+                } finally {
+                    button.disabled = false;
+                    button.textContent = 'Enable';
+                }
+    }catch(err){
+        console.error('Error requesting requestAutofillPermissions:', err);
+        this.showError('Failed to request permissions');
     }
+    }
+
 
     /**
      * Request specific optional permissions

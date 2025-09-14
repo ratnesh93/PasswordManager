@@ -104,38 +104,38 @@ class PermissionManager {
    * @returns {Promise<boolean>}
    */
   async requestHostPermissions(origins = []) {
+    const originsToRequest = origins.length > 0 ? origins : this.optionalHostPermissions;
+  
     try {
-      const originsToRequest = origins.length > 0 ? origins : this.optionalHostPermissions;
-      
-      // Check if already granted
-      try {
-        const alreadyGranted = await this.hasHostPermissions(originsToRequest);
-        if (alreadyGranted) {
-          return true;
-        }
-      } catch (checkError) {
-        // If we can't check permissions, we can't proceed
-        console.error('Error checking host permissions:', checkError);
-        return false;
+      const alreadyGranted = await this.hasHostPermissions(originsToRequest);
+      if (alreadyGranted) {
+        return true;
       }
-
-      // Request host permissions
-      const granted = await chrome.permissions.request({
-        origins: originsToRequest
-      });
-
-      if (granted) {
-        console.log('Host permissions granted:', originsToRequest);
-      } else {
-        console.warn('Host permissions denied:', originsToRequest);
-      }
-
-      return granted;
-    } catch (error) {
-      console.error('Error requesting host permissions:', error);
+    } catch (checkError) {
+      console.error('Error checking host permissions:', checkError);
       return false;
     }
+  
+    return new Promise((resolve) => {
+      chrome.permissions.request({ permissions: this.optionalPermissions, origins: originsToRequest }, (granted) => {
+        if (chrome.runtime.lastError) {
+          console.error('Error requesting host permissions:', chrome.runtime.lastError);
+          resolve(false);
+          return;
+        }
+  
+        if (granted) {
+          console.log('Optional permission granted: ', this.optionalPermissions);
+          console.log('Host permissions granted:', originsToRequest);
+          resolve(true);
+        } else {
+          console.warn('Host permissions denied:', originsToRequest);
+          resolve(false);
+        }
+      });
+    });
   }
+  
 
   /**
    * Request permissions needed for autofill functionality

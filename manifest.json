@@ -9,13 +9,13 @@
     "contextMenus",
     "scripting"
   ],
+
+  "host_permissions": [
+    "<all_urls>"
+  ],
   
   "optional_permissions": [
     "activeTab"
-  ],
-  
-  "optional_host_permissions": [
-    "<all_urls>"
   ],
   
   "background": {
