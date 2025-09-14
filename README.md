@@ -60,11 +60,10 @@ This basic structure addresses all requirements by providing:
 ## Next Steps
 
 The basic project structure is now complete. The next tasks will implement:
-1. Core encryption services
-2. Storage management
-3. Gmail OAuth integration
-4. Full UI functionality
-5. Comprehensive testing
+1. Import Functionality.
+2. Right-click context menu integration for enhanced usability across websites.
+3. Automatic form detection and autofill.
+4. UI functionality and aesthetic improvement.
 
 ## Notes
 
