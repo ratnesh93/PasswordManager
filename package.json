@@ -1,0 +1,31 @@
+{
+  "name": "chrome-password-manager",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "A secure local password manager Chrome extension",
+  "scripts": {
+    "build": "echo 'No build process needed for basic extension'",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "dev": "node setup-dev.js dev",
+    "prod": "node setup-dev.js prod",
+    "setup:dev": "node setup-dev.js dev",
+    "setup:prod": "node setup-dev.js prod",
+    "lint": "echo 'Linting will be added in later tasks'"
+  },
+  "keywords": [
+    "chrome-extension",
+    "password-manager",
+    "security",
+    "encryption"
+  ],
+  "author": "Chrome Password Manager Team",
+  "license": "MIT",
+  "devDependencies": {
+    "vitest": "^1.0.0",
+    "jsdom": "^23.0.0"
+  },
+  "dependencies": {}
+}

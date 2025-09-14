@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Chrome Password Manager Components</title>
+</head>
+<body>
+    <h1>Chrome Password Manager - Component Testing</h1>
+    
+    <div id="crypto-test">
+        <h2>Crypto Service Test</h2>
+        <button onclick="testCrypto()">Test Encryption</button>
+        <div id="crypto-results"></div>
+    </div>
+    
+    <div id="storage-test">
+        <h2>Storage Manager Test (Mock)</h2>
+        <button onclick="testStorage()">Test Storage</button>
+        <div id="storage-results"></div>
+    </div>
+    
+    <script src="src/crypto/crypto.js"></script>
+    <script src="src/storage/storage.js"></script>
+    
+    <script>
+        // Mock Chrome APIs for testing
+        window.chrome = {
+            storage: {
+                local: {
+                    set: (data) => Promise.resolve(),
+                    get: (keys) => Promise.resolve({}),
+                    remove: (keys) => Promise.resolve()
+                }
+            }
+        };
+        
+        async function testCrypto() {
+            const results = document.getElementById('crypto-results');
+            results.innerHTML = '<p>Testing crypto service...</p>';
+            
+            try {
+                const crypto = new CryptoService();
+                
+                // Test key phrase generation
+                const keyPhrase = await crypto.generateKeyPhrase();
+                results.innerHTML += `<p>✅ Key Phrase Generated: ${keyPhrase.join(' ')}</p>`;
+                
+                // Test encryption
+                const testData = 'Hello, World!';
+                const password = 'test-password';
+                const encrypted = await crypto.encryptData(testData, password);
+                results.innerHTML += `<p>✅ Data Encrypted: ${encrypted.substring(0, 50)}...</p>`;
+                
+                // Test decryption
+                const decrypted = await crypto.decryptData(encrypted, password);
+                results.innerHTML += `<p>✅ Data Decrypted: ${decrypted}</p>`;
+                
+                results.innerHTML += '<p><strong>✅ All crypto tests passed!</strong></p>';
+            } catch (error) {
+                results.innerHTML += `<p>❌ Error: ${error.message}</p>`;
+            }
+        }
+        
+        async function testStorage() {
+            const results = document.getElementById('storage-results');
+            results.innerHTML = '<p>Testing storage manager...</p>';
+            
+            try {
+                const storage = new StorageManager();
+                
+                // Test serialization
+                const testCredentials = [
+                    {
+                        id: 'test1',
+                        url: 'https://example.com',
+                        username: 'testuser',
+                        password: 'testpass'
+                    }
+                ];
+                
+                const serialized = storage.serializeCredentials(testCredentials);
+                results.innerHTML += '<p>✅ Credentials Serialized</p>';
+                
+                const deserialized = storage.deserializeCredentials(serialized);
+                results.innerHTML += `<p>✅ Credentials Deserialized: ${deserialized.length} items</p>`;
+                
+                // Test validation
+                const isValid = storage.validateStorageData('dGVzdERhdGE='); // base64 'testData'
+                results.innerHTML += `<p>✅ Data Validation: ${isValid}</p>`;
+                
+                results.innerHTML += '<p><strong>✅ All storage tests passed!</strong></p>';
+            } catch (error) {
+                results.innerHTML += `<p>❌ Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

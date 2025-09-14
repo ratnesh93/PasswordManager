@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Global Controller</title>
+</head>
+<body>
+    <h1>Test Global Controller Access</h1>
+    <div id="debug-output"></div>
+    
+    <script>
+        function debugController() {
+            const output = document.getElementById('debug-output');
+            
+            output.innerHTML += '<p>Testing window.popupController access...</p>';
+            
+            // Check if popupController exists
+            if (typeof window.popupController === 'undefined') {
+                output.innerHTML += '<p style="color: red;">❌ window.popupController is undefined</p>';
+            } else {
+                output.innerHTML += '<p style="color: green;">✅ window.popupController exists</p>';
+                
+                // Check if showMasterPasswordModal method exists
+                if (typeof window.popupController.showMasterPasswordModal === 'function') {
+                    output.innerHTML += '<p style="color: green;">✅ showMasterPasswordModal method exists</p>';
+                } else {
+                    output.innerHTML += '<p style="color: red;">❌ showMasterPasswordModal method missing</p>';
+                }
+                
+                // List all available methods
+                const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(window.popupController))
+                    .filter(name => typeof window.popupController[name] === 'function');
+                output.innerHTML += '<p>Available methods: ' + methods.join(', ') + '</p>';
+            }
+        }
+        
+        // Test immediately
+        debugController();
+        
+        // Test after DOM loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            output.innerHTML += '<p>--- After DOMContentLoaded ---</p>';
+            debugController();
+        });
+        
+        // Test after a delay
+        setTimeout(() => {
+            output.innerHTML += '<p>--- After 1 second delay ---</p>';
+            debugController();
+        }, 1000);
+    </script>
+</body>
+</html>

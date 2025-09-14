@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chrome Password Manager - Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #4285f4;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #3367d6;
+        }
+        .instructions {
+            background-color: #e8f0fe;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .test-result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔐 Chrome Password Manager - Test Page</h1>
+    
+    <div class="instructions">
+        <h3>📋 Testing Instructions:</h3>
+        <ol>
+            <li>Make sure the Chrome Password Manager extension is loaded in Chrome</li>
+            <li>Open Chrome DevTools (F12) to see console messages</li>
+            <li>Right-click on form fields to test context menu integration</li>
+            <li>Fill out forms and test save/autofill functionality</li>
+            <li>Click the extension icon to access the popup interface</li>
+        </ol>
+    </div>
+
+    <!-- Login Form Test -->
+    <div class="test-section">
+        <h2>🔑 Login Form Test</h2>
+        <p>Test credential saving and autofill on this login form:</p>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="loginEmail">Email:</label>
+                <input type="email" id="loginEmail" name="email" placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Password:</label>
+                <input type="password" id="loginPassword" name="password" placeholder="Enter your password">
+            </div>
+            <button type="submit">Login</button>
+        </form>
+        <div id="loginResult" class="test-result" style="display: none;"></div>
+    </div>
+
+    <!-- Registration Form Test -->
+    <div class="test-section">
+        <h2>📝 Registration Form Test</h2>
+        <p>Test credential saving on a registration form:</p>
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="regUsername">Username:</label>
+                <input type="text" id="regUsername" name="username" placeholder="Choose a username">
+            </div>
+            <div class="form-group">
+                <label for="regEmail">Email:</label>
+                <input type="email" id="regEmail" name="email" placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="regPassword">Password:</label>
+                <input type="password" id="regPassword" name="password" placeholder="Create a password">
+            </div>
+            <div class="form-group">
+                <label for="regConfirmPassword">Confirm Password:</label>
+                <input type="password" id="regConfirmPassword" name="confirmPassword" placeholder="Confirm your password">
+            </div>
+            <button type="submit">Register</button>
+        </form>
+        <div id="registerResult" class="test-result" style="display: none;"></div>
+    </div>
+
+    <!-- Banking Form Test -->
+    <div class="test-section">
+        <h2>🏦 Banking Form Test</h2>
+        <p>Test with sensitive financial forms:</p>
+        <form id="bankingForm">
+            <div class="form-group">
+                <label for="accountNumber">Account Number:</label>
+                <input type="text" id="accountNumber" name="accountNumber" placeholder="Enter account number">
+            </div>
+            <div class="form-group">
+                <label for="routingNumber">Routing Number:</label>
+                <input type="text" id="routingNumber" name="routingNumber" placeholder="Enter routing number">
+            </div>
+            <div class="form-group">
+                <label for="bankPin">PIN:</label>
+                <input type="password" id="bankPin" name="pin" placeholder="Enter PIN">
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+        <div id="bankingResult" class="test-result" style="display: none;"></div>
+    </div>
+
+    <!-- Context Menu Test -->
+    <div class="test-section">
+        <h2>🖱️ Context Menu Test</h2>
+        <p>Right-click on the fields below to test context menu integration:</p>
+        <div class="form-group">
+            <label for="contextTest">Test Field:</label>
+            <input type="text" id="contextTest" placeholder="Right-click me to test context menu">
+        </div>
+        <div class="form-group">
+            <label for="contextPassword">Password Field:</label>
+            <input type="password" id="contextPassword" placeholder="Right-click me too">
+        </div>
+    </div>
+
+    <!-- Performance Test -->
+    <div class="test-section">
+        <h2>⚡ Performance Test</h2>
+        <p>Test extension performance with multiple forms:</p>
+        <button id="createMultipleForms">Create 10 Test Forms</button>
+        <button id="clearForms">Clear Forms</button>
+        <div id="performanceResult" class="test-result" style="display: none;"></div>
+        <div id="dynamicForms"></div>
+    </div>
+
+    <!-- Extension Status -->
+    <div class="test-section">
+        <h2>📊 Extension Status</h2>
+        <button id="checkExtension">Check Extension Status</button>
+        <div id="extensionStatus" class="test-result" style="display: none;"></div>
+    </div>
+
+    <script>
+        // Form submission handlers
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showResult('loginResult', 'Login form submitted! Check if credentials were saved.', 'success');
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showResult('registerResult', 'Registration form submitted! Check if credentials were saved.', 'success');
+        });
+
+        document.getElementById('bankingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showResult('bankingResult', 'Banking form submitted! Check if sensitive data was handled properly.', 'success');
+        });
+
+        // Performance test
+        document.getElementById('createMultipleForms').addEventListener('click', function() {
+            const container = document.getElementById('dynamicForms');
+            container.innerHTML = '';
+            
+            const startTime = performance.now();
+            
+            for (let i = 1; i <= 10; i++) {
+                const formDiv = document.createElement('div');
+                formDiv.innerHTML = `
+                    <h4>Form ${i}</h4>
+                    <input type="text" placeholder="Username ${i}" name="username${i}">
+                    <input type="password" placeholder="Password ${i}" name="password${i}">
+                    <br><br>
+                `;
+                container.appendChild(formDiv);
+            }
+            
+            const endTime = performance.now();
+            showResult('performanceResult', `Created 10 forms in ${(endTime - startTime).toFixed(2)}ms`, 'success');
+        });
+
+        document.getElementById('clearForms').addEventListener('click', function() {
+            document.getElementById('dynamicForms').innerHTML = '';
+            showResult('performanceResult', 'Forms cleared', 'success');
+        });
+
+        // Extension status check
+        document.getElementById('checkExtension').addEventListener('click', function() {
+            if (typeof chrome !== 'undefined' && chrome.runtime) {
+                try {
+                    chrome.runtime.sendMessage({type: 'PING'}, function(response) {
+                        if (chrome.runtime.lastError) {
+                            showResult('extensionStatus', 'Extension not responding: ' + chrome.runtime.lastError.message, 'error');
+                        } else {
+                            showResult('extensionStatus', 'Extension is active and responding!', 'success');
+                        }
+                    });
+                } catch (error) {
+                    showResult('extensionStatus', 'Extension communication error: ' + error.message, 'error');
+                }
+            } else {
+                showResult('extensionStatus', 'Chrome extension APIs not available. Make sure you\'re testing in Chrome with the extension loaded.', 'error');
+            }
+        });
+
+        function showResult(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `test-result ${type}`;
+            element.style.display = 'block';
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        // Log page load for debugging
+        console.log('Chrome Password Manager Test Page Loaded');
+        console.log('Chrome APIs available:', typeof chrome !== 'undefined');
+        
+        // Test form field detection
+        window.addEventListener('load', function() {
+            const forms = document.querySelectorAll('form');
+            console.log(`Detected ${forms.length} forms on page`);
+            
+            const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"]');
+            console.log(`Detected ${inputs.length} input fields`);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Enhanced Security Features</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-step {
+            margin: 20px 0;
+            padding: 15px;
+            border-left: 4px solid #007cba;
+            background-color: #f8f9fa;
+        }
+        .feature-new {
+            background-color: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
+        }
+        .security-enhanced {
+            background-color: #fff3cd;
+            border-left-color: #ffc107;
+            color: #856404;
+        }
+        .test-checklist {
+            background-color: #e7f3ff;
+            border-left-color: #0066cc;
+        }
+        code {
+            background-color: #e9ecef;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        .icon {
+            font-size: 1.2em;
+            margin-right: 8px;
+        }
+        .warning {
+            background-color: #f8d7da;
+            border-left-color: #dc3545;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1><span class="icon">🔐</span>Enhanced Security Features</h1>
+        
+        <div class="test-step feature-new">
+            <h3><span class="icon">🆕</span>New Features Added:</h3>
+            <ul>
+                <li><strong>Delete Account:</strong> Complete account deletion with master password verification</li>
+                <li><strong>Context Menu Authentication:</strong> Right-click password saving requires login</li>
+                <li><strong>10-Minute Session Timeout:</strong> Enhanced security with shorter session duration</li>
+            </ul>
+        </div>
+
+        <div class="test-step security-enhanced">
+            <h3><span class="icon">🛡️</span>Security Enhancements:</h3>
+            <ul>
+                <li><strong>Session Duration:</strong> Reduced from 30 minutes to 10 minutes</li>
+                <li><strong>Context Menu Protection:</strong> Requires active authentication before saving</li>
+                <li><strong>Account Deletion Security:</strong> Master password verification required</li>
+                <li><strong>Data Cleanup:</strong> Complete removal of all user data on account deletion</li>
+            </ul>
+        </div>
+
+        <div class="test-step test-checklist">
+            <h3><span class="icon">🧪</span>Feature 1: Delete Account</h3>
+            
+            <h4>Testing Steps:</h4>
+            <ol>
+                <li>Login to the password manager</li>
+                <li>Navigate to the main interface</li>
+                <li>Look for the red "Delete Account" button in the bottom menu</li>
+                <li>Click "Delete Account"</li>
+                <li><strong>Verify:</strong> Modal appears with warning message</li>
+                <li>Try clicking "Delete Account Permanently" without entering password</li>
+                <li><strong>Verify:</strong> Button is disabled</li>
+                <li>Enter incorrect master password</li>
+                <li><strong>Verify:</strong> Error message appears</li>
+                <li>Enter correct master password and check the confirmation checkbox</li>
+                <li><strong>Verify:</strong> Button becomes enabled</li>
+                <li>Click "Delete Account Permanently"</li>
+                <li><strong>Verify:</strong> Account is deleted and returns to auth screen</li>
+            </ol>
+
+            <div class="warning">
+                <strong>⚠️ Warning:</strong> Account deletion is permanent! Test with a test account only.
+            </div>
+        </div>
+
+        <div class="test-step test-checklist">
+            <h3><span class="icon">🧪</span>Feature 2: Context Menu Authentication</h3>
+            
+            <h4>Testing Steps:</h4>
+            <ol>
+                <li>Ensure you're logged out of the password manager</li>
+                <li>Go to any website with a login form (e.g., facebook.com)</li>
+                <li>Right-click on the page</li>
+                <li>Look for "Save to Password Manager" option</li>
+                <li>Click the context menu option</li>
+                <li><strong>Verify:</strong> Notification appears: "Please login to Password Manager first"</li>
+                <li><strong>Verify:</strong> Extension popup opens automatically</li>
+                <li>Login to the password manager</li>
+                <li>Go back to the website and try the context menu again</li>
+                <li><strong>Verify:</strong> Now it attempts to save credentials or prompts for master password</li>
+            </ol>
+        </div>
+
+        <div class="test-step test-checklist">
+            <h3><span class="icon">🧪</span>Feature 3: 10-Minute Session Timeout</h3>
+            
+            <h4>Testing Steps:</h4>
+            <ol>
+                <li>Login to the password manager</li>
+                <li>Note the current time</li>
+                <li>Leave the extension open and wait 10+ minutes</li>
+                <li>Try to perform any action (add credential, view credentials, etc.)</li>
+                <li><strong>Verify:</strong> Session has expired and you're redirected to login</li>
+            </ol>
+
+            <h4>Quick Test (for development):</h4>
+            <ol>
+                <li>Temporarily modify <code>sessionDuration</code> in <code>session-manager.js</code> to 30 seconds</li>
+                <li>Login and wait 30+ seconds</li>
+                <li>Try to perform an action</li>
+                <li><strong>Verify:</strong> Session timeout works correctly</li>
+                <li>Restore the 10-minute setting</li>
+            </ol>
+        </div>
+
+        <div class="test-step">
+            <h3><span class="icon">🔧</span>Technical Implementation:</h3>
+            
+            <h4>Delete Account:</h4>
+            <ul>
+                <li>New modal in <code>popup.html</code> with confirmation UI</li>
+                <li>Master password verification before deletion</li>
+                <li>Complete data cleanup via <code>clearAllData()</code></li>
+                <li>Session termination and cache clearing</li>
+            </ul>
+
+            <h4>Context Menu Authentication:</h4>
+            <ul>
+                <li>Modified <code>handleContextMenuSave()</code> to check authentication</li>
+                <li>Automatic popup opening for login when not authenticated</li>
+                <li>Notification system for user feedback</li>
+            </ul>
+
+            <h4>Session Timeout:</h4>
+            <ul>
+                <li>Changed <code>sessionDuration</code> from 30 to 10 minutes</li>
+                <li>Existing timeout mechanism handles the shorter duration</li>
+                <li>Automatic session cleanup and redirect to login</li>
+            </ul>
+        </div>
+
+        <div class="test-step">
+            <h3><span class="icon">📁</span>Files Modified:</h3>
+            <ul>
+                <li><code>src/popup/popup.html</code> - Added delete account modal and button</li>
+                <li><code>src/popup/popup.js</code> - Added delete account functionality</li>
+                <li><code>src/popup/popup.css</code> - Added danger button styling</li>
+                <li><code>src/background/background.js</code> - Added delete account handler and context menu auth</li>
+                <li><code>src/auth/session-manager.js</code> - Reduced session duration to 10 minutes</li>
+                <li><code>src/storage/storage.js</code> - Already had clearAllData method</li>
+            </ul>
+        </div>
+
+        <div class="test-step security-enhanced">
+            <h3><span class="icon">🎯</span>Security Benefits:</h3>
+            <ul>
+                <li><strong>Reduced Attack Window:</strong> 10-minute sessions limit exposure time</li>
+                <li><strong>Protected Context Actions:</strong> No unauthorized credential saving</li>
+                <li><strong>Secure Account Deletion:</strong> Prevents accidental or unauthorized deletion</li>
+                <li><strong>Complete Data Removal:</strong> No residual data after account deletion</li>
+                <li><strong>User Control:</strong> Clear options for account management</li>
+            </ul>
+        </div>
+
+        <div class="test-step warning">
+            <h3><span class="icon">⚠️</span>Important Notes:</h3>
+            <ul>
+                <li><strong>Account Deletion is Permanent:</strong> Cannot be undone</li>
+                <li><strong>Session Timeout:</strong> Users will need to re-authenticate more frequently</li>
+                <li><strong>Context Menu:</strong> Requires extension to be logged in for password saving</li>
+                <li><strong>Data Loss:</strong> Account deletion removes ALL stored passwords</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Minimal Popup Test</title>
+</head>
+<body>
+    <h1>Minimal Popup Test</h1>
+    <div id="output"></div>
+    
+    <script>
+        console.log('🔍 Minimal test script loaded');
+        document.getElementById('output').innerHTML = 'Script is working!';
+        
+        window.testFunction = function() {
+            console.log('🔍 Test function called');
+            return 'Test function works!';
+        };
+        
+        console.log('🔍 Test function created:', typeof window.testFunction);
+    </script>
+</body>
+</html>

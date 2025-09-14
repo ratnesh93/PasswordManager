@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Feedback and Accessibility Test</title>
+    <link rel="stylesheet" href="src/popup/popup.css">
+    <style>
+        body {
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #e8eaed;
+            border-radius: 8px;
+        }
+        .test-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: #1a73e8;
+        }
+        .demo-credential {
+            background: #f8f9fa;
+            border: 1px solid #e8eaed;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .demo-info {
+            flex: 1;
+        }
+        .demo-url {
+            font-weight: 500;
+            color: #1a73e8;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        .demo-username {
+            color: #5f6368;
+            font-size: 13px;
+        }
+        .demo-actions {
+            display: flex;
+            gap: 4px;
+        }
+        .keyboard-shortcuts {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 12px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Visual Feedback and Accessibility Features Test</h1>
+    
+    <!-- Screen reader announcer -->
+    <div id="screen-reader-announcer" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+    
+    <!-- Skip link test -->
+    <div class="test-section">
+        <div class="test-title">Skip Link (Tab to focus)</div>
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+        <main id="main-content" tabindex="-1">
+            <p>Main content area - skip link should jump here</p>
+        </main>
+    </div>
+
+    <!-- Password visibility states -->
+    <div class="test-section">
+        <div class="test-title">Password Visibility States</div>
+        
+        <div class="demo-credential credential-item" tabindex="0" 
+             title="Keyboard shortcuts: V=view password, C=copy, E=edit, Delete=remove, ↑↓=navigate">
+            <div class="demo-info credential-info">
+                <div class="demo-url credential-url">example.com</div>
+                <div class="demo-username credential-username">user@example.com</div>
+                <div class="credential-password">
+                    <span class="password-display" data-credential-id="demo1" aria-label="Password is hidden" aria-live="polite">••••••••</span>
+                </div>
+            </div>
+            <div class="demo-actions credential-actions">
+                <button class="action-btn eye-btn" data-credential-id="demo1" 
+                        aria-label="Show password for this credential" tabindex="0">
+                    <span class="btn-icon" aria-hidden="true">👁️</span>
+                    <span class="btn-text">Show</span>
+                </button>
+                <button class="action-btn copy-btn" aria-label="Copy password to clipboard" tabindex="0">
+                    <span class="btn-icon" aria-hidden="true">📋</span>
+                    <span class="btn-text">Copy</span>
+                </button>
+                <button class="action-btn edit-btn" aria-label="Edit this credential" tabindex="0">
+                    <span class="btn-icon" aria-hidden="true">✏️</span>
+                    <span class="btn-text">Edit</span>
+                </button>
+                <button class="action-btn delete-btn" aria-label="Delete this credential" tabindex="0">
+                    <span class="btn-icon" aria-hidden="true">🗑️</span>
+                    <span class="btn-text sr-only">Delete</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Password visible state -->
+        <div class="demo-credential credential-item" tabindex="0">
+            <div class="demo-info credential-info">
+                <div class="demo-url credential-url">github.com</div>
+                <div class="demo-username credential-username">developer@github.com</div>
+                <div class="credential-password">
+                    <span class="password-display password-visible" data-credential-id="demo2" 
+                          aria-label="Password is now visible: MySecurePassword123" aria-live="polite">MySecurePassword123</span>
+                </div>
+            </div>
+            <div class="demo-actions credential-actions">
+                <button class="action-btn eye-btn password-visible" data-credential-id="demo2" 
+                        aria-label="Hide password for this credential" tabindex="0">
+                    <span class="btn-icon" aria-hidden="true">👁️‍🗨️</span>
+                    <span class="btn-text">Hide</span>
+                </button>
+                <button class="action-btn copy-btn success" aria-label="Copy password to clipboard" tabindex="0">
+                    <span class="btn-icon" aria-hidden="true">📋</span>
+                    <span class="btn-text">Copy</span>
+                </button>
+                <button class="action-btn edit-btn" aria-label="Edit this credential" tabindex="0">
+                    <span class="btn-icon" aria-hidden="true">✏️</span>
+                    <span class="btn-text">Edit</span>
+                </button>
+                <button class="action-btn delete-btn" aria-label="Delete this credential" tabindex="0">
+                    <span class="btn-icon" aria-hidden="true">🗑️</span>
+                    <span class="btn-text sr-only">Delete</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading state -->
+        <div class="demo-credential credential-item" tabindex="0">
+            <div class="demo-info credential-info">
+                <div class="demo-url credential-url">loading.com</div>
+                <div class="demo-username credential-username">test@loading.com</div>
+                <div class="credential-password">
+                    <span class="password-display" data-credential-id="demo3" aria-label="Password is hidden" aria-live="polite">••••••••</span>
+                </div>
+            </div>
+            <div class="demo-actions credential-actions">
+                <button class="action-btn eye-btn loading" data-credential-id="demo3" 
+                        aria-label="Verifying master password for password reveal" disabled>
+                    <span class="btn-icon loading-spinner" aria-hidden="true"></span>
+                    <span class="btn-text">Verifying...</span>
+                </button>
+                <button class="action-btn copy-btn" aria-label="Copy password to clipboard" tabindex="0">
+                    <span class="btn-icon" aria-hidden="true">📋</span>
+                    <span class="btn-text">Copy</span>
+                </button>
+                <button class="action-btn edit-btn" aria-label="Edit this credential" tabindex="0">
+                    <span class="btn-icon" aria-hidden="true">✏️</span>
+                    <span class="btn-text">Edit</span>
+                </button>
+                <button class="action-btn delete-btn error" aria-label="Delete this credential" tabindex="0">
+                    <span class="btn-icon" aria-hidden="true">🗑️</span>
+                    <span class="btn-text sr-only">Delete</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Keyboard shortcuts guide -->
+    <div class="test-section">
+        <div class="test-title">Keyboard Navigation</div>
+        <div class="keyboard-shortcuts">
+            <strong>Credential Item Shortcuts:</strong><br>
+            • V = View/Hide password<br>
+            • C = Copy password<br>
+            • E = Edit credential<br>
+            • Delete/Backspace = Delete credential<br>
+            • ↑/↓ = Navigate between credentials<br>
+            • Tab = Navigate to action buttons<br>
+            • Enter/Space = Activate focused element
+        </div>
+        <p>Focus on the credential items above and try the keyboard shortcuts!</p>
+    </div>
+
+    <!-- Focus indicators test -->
+    <div class="test-section">
+        <div class="test-title">Focus Indicators (Tab through these)</div>
+        <button class="action-btn eye-btn">Eye Button</button>
+        <button class="action-btn copy-btn">Copy Button</button>
+        <button class="action-btn edit-btn">Edit Button</button>
+        <button class="action-btn delete-btn">Delete Button</button>
+    </div>
+
+    <script>
+        // Simple demo functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Demo eye button toggle
+            document.querySelectorAll('.eye-btn:not(.loading)').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const credentialId = this.getAttribute('data-credential-id');
+                    const passwordDisplay = document.querySelector(`[data-credential-id="${credentialId}"].password-display`);
+                    
+                    if (this.classList.contains('password-visible')) {
+                        // Hide password
+                        passwordDisplay.textContent = '••••••••';
+                        passwordDisplay.classList.remove('password-visible');
+                        passwordDisplay.setAttribute('aria-label', 'Password is hidden');
+                        
+                        this.innerHTML = '<span class="btn-icon" aria-hidden="true">👁️</span><span class="btn-text">Show</span>';
+                        this.setAttribute('aria-label', 'Show password for this credential');
+                        this.classList.remove('password-visible');
+                        
+                        announceToScreenReader('Password hidden');
+                    } else {
+                        // Show password
+                        passwordDisplay.textContent = 'DemoPassword123';
+                        passwordDisplay.classList.add('password-visible');
+                        passwordDisplay.setAttribute('aria-label', 'Password is now visible: DemoPassword123');
+                        
+                        this.innerHTML = '<span class="btn-icon" aria-hidden="true">👁️‍🗨️</span><span class="btn-text">Hide</span>';
+                        this.setAttribute('aria-label', 'Hide password for this credential');
+                        this.classList.add('password-visible');
+                        
+                        announceToScreenReader('Password revealed');
+                    }
+                });
+            });
+
+            // Demo copy button
+            document.querySelectorAll('.copy-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.classList.add('success');
+                    announceToScreenReader('Password copied to clipboard');
+                    setTimeout(() => {
+                        this.classList.remove('success');
+                    }, 2000);
+                });
+            });
+
+            // Demo keyboard navigation
+            document.querySelectorAll('.credential-item').forEach(item => {
+                item.addEventListener('keydown', function(e) {
+                    if (e.key === 'v' || e.key === 'V') {
+                        e.preventDefault();
+                        const eyeBtn = this.querySelector('.eye-btn');
+                        if (eyeBtn && !eyeBtn.disabled) {
+                            eyeBtn.click();
+                        }
+                    } else if (e.key === 'c' || e.key === 'C') {
+                        e.preventDefault();
+                        const copyBtn = this.querySelector('.copy-btn');
+                        if (copyBtn) {
+                            copyBtn.click();
+                        }
+                    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        const items = Array.from(document.querySelectorAll('.credential-item'));
+                        const currentIndex = items.indexOf(this);
+                        let nextIndex = currentIndex + (e.key === 'ArrowDown' ? 1 : -1);
+                        
+                        if (nextIndex < 0) nextIndex = items.length - 1;
+                        if (nextIndex >= items.length) nextIndex = 0;
+                        
+                        items[nextIndex].focus();
+                        announceToScreenReader(`Focused on credential ${nextIndex + 1} of ${items.length}`);
+                    }
+                });
+            });
+        });
+
+        function announceToScreenReader(message) {
+            const announcer = document.getElementById('screen-reader-announcer');
+            announcer.textContent = '';
+            setTimeout(() => {
+                announcer.textContent = message;
+            }, 100);
+        }
+    </script>
+</body>
+</html>

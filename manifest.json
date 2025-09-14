@@ -1,0 +1,49 @@
+{
+  "manifest_version": 3,
+  "name": "Chrome Password Manager",
+  "version": "1.0.1",
+  "description": "A secure local password manager with custom authentication",
+  
+  "permissions": [
+    "storage",
+    "contextMenus",
+    "scripting"
+  ],
+  
+  "optional_permissions": [
+    "activeTab"
+  ],
+  
+  "optional_host_permissions": [
+    "<all_urls>"
+  ],
+  
+  "background": {
+    "service_worker": "src/background/background.js"
+  },
+  
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content/content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_title": "Chrome Password Manager"
+  },
+  
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests;",
+    "sandbox": "sandbox allow-scripts; script-src 'self';"
+  },
+  
+  "web_accessible_resources": [
+    {
+      "resources": ["src/popup/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

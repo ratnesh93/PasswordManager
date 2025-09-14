@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Secure Edit Functionality</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .credential-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin: 10px 0;
+            border-radius: 3px;
+        }
+        .credential-info {
+            flex-grow: 1;
+        }
+        .credential-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .action-btn {
+            padding: 5px 10px;
+            border: 1px solid #007cba;
+            background: #007cba;
+            color: white;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .action-btn:hover {
+            background: #005a87;
+        }
+        .action-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            max-width: 400px;
+            width: 90%;
+        }
+        .form-group {
+            margin: 10px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: #007cba;
+            color: white;
+            border-color: #007cba;
+        }
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+        .message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+        }
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Secure Edit Functionality</h1>
+    
+    <div class="test-section">
+        <h2>Test Credentials</h2>
+        <div id="credential-list">
+            <!-- Credentials will be rendered here -->
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="test-results">
+            <!-- Test results will appear here -->
+        </div>
+    </div>
+
+    <!-- Master Password Modal -->
+    <div id="master-password-modal" class="modal">
+        <div class="modal-content">
+            <h3>Master Password Required</h3>
+            <p id="master-password-message">Please enter your master password:</p>
+            <div class="form-group">
+                <input type="password" id="modal-master-password" placeholder="Enter master password">
+            </div>
+            <div class="button-group">
+                <button id="cancel-master-password" class="btn btn-secondary">Cancel</button>
+                <button id="continue-master-password" class="btn btn-primary">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Credential Modal -->
+    <div id="credential-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-title">Edit Credential</h3>
+            <form id="credential-form">
+                <div class="form-group">
+                    <label for="credential-url">URL:</label>
+                    <input type="text" id="credential-url" required>
+                </div>
+                <div class="form-group">
+                    <label for="credential-username">Username:</label>
+                    <input type="text" id="credential-username" required>
+                </div>
+                <div class="form-group">
+                    <label for="credential-password">Password:</label>
+                    <input type="text" id="credential-password" required>
+                </div>
+                <div class="button-group">
+                    <button type="button" id="cancel-credential" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <span id="save-btn-text">Update Credential</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Mock Chrome API for testing
+        window.chrome = {
+            runtime: {
+                sendMessage: function(message) {
+                    console.log('Mock Chrome API called:', message);
+                    
+                    // Simulate different responses based on message type
+                    if (message.type === 'GET_CREDENTIAL_PASSWORD') {
+                        // Simulate master password verification
+                        if (message.payload.masterPassword === 'correct-password') {
+                            return Promise.resolve({
+                                success: true,
+                                password: 'ActualPassword123!'
+                            });
+                        } else {
+                            return Promise.resolve({
+                                success: false,
+                                error: 'Invalid master password'
+                            });
+                        }
+                    }
+                    
+                    return Promise.resolve({ success: false, error: 'Unknown message type' });
+                }
+            }
+        };
+
+        // Simplified PopupController for testing
+        class TestPopupController {
+            constructor() {
+                this.allCredentials = [
+                    { id: '1', url: 'example.com', username: 'user@example.com', password: '••••••••' },
+                    { id: '2', url: 'github.com', username: 'developer@github.com', password: '••••••••' }
+                ];
+                this.currentEditingCredential = null;
+                this.masterPasswordResolve = null;
+                this.setupEventListeners();
+                this.renderCredentials();
+            }
+
+            setupEventListeners() {
+                // Master password modal
+                document.getElementById('cancel-master-password').addEventListener('click', () => {
+                    this.hideMasterPasswordModal();
+                    if (this.masterPasswordResolve) {
+                        this.masterPasswordResolve(null);
+                    }
+                });
+
+                document.getElementById('continue-master-password').addEventListener('click', () => {
+                    const password = document.getElementById('modal-master-password').value;
+                    this.hideMasterPasswordModal();
+                    if (this.masterPasswordResolve) {
+                        this.masterPasswordResolve(password);
+                    }
+                });
+
+                // Edit modal
+                document.getElementById('cancel-credential').addEventListener('click', () => {
+                    this.hideCredentialModal();
+                });
+
+                document.getElementById('credential-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleCredentialSubmit();
+                });
+            }
+
+            renderCredentials() {
+                const container = document.getElementById('credential-list');
+                container.innerHTML = '';
+
+                this.allCredentials.forEach(credential => {
+                    const item = document.createElement('div');
+                    item.className = 'credential-item';
+                    
+                    const info = document.createElement('div');
+                    info.className = 'credential-info';
+                    info.innerHTML = `
+                        <div><strong>${credential.url}</strong></div>
+                        <div>${credential.username}</div>
+                    `;
+
+                    const actions = document.createElement('div');
+                    actions.className = 'credential-actions';
+                    
+                    const editBtn = document.createElement('button');
+                    editBtn.className = 'action-btn';
+                    editBtn.textContent = 'Edit';
+                    editBtn.addEventListener('click', () => this.editCredential(credential.id));
+
+                    actions.appendChild(editBtn);
+                    item.appendChild(info);
+                    item.appendChild(actions);
+                    container.appendChild(item);
+                });
+            }
+
+            async editCredential(credentialId) {
+                const credential = this.allCredentials.find(c => c.id === credentialId);
+                if (!credential) return;
+
+                try {
+                    this.logResult(`Starting edit for credential: ${credential.url}`, 'info');
+
+                    // Request master password verification for edit operation
+                    const masterPassword = await this.showMasterPasswordModal(
+                        'Please enter your master password to edit this credential:',
+                        'credential-edit'
+                    );
+
+                    if (!masterPassword) {
+                        this.logResult('Edit cancelled by user', 'info');
+                        return;
+                    }
+
+                    this.logResult(`Master password entered: ${masterPassword}`, 'info');
+
+                    // Request actual credential data with password from background service
+                    const response = await chrome.runtime.sendMessage({
+                        type: 'GET_CREDENTIAL_PASSWORD',
+                        payload: {
+                            credentialId: credentialId,
+                            masterPassword: masterPassword
+                        }
+                    });
+
+                    if (!response.success) {
+                        this.logResult(`Verification failed: ${response.error}`, 'error');
+                        return;
+                    }
+
+                    this.logResult(`Master password verified successfully. Actual password: ${response.password}`, 'success');
+
+                    // Master password verified - proceed with edit form
+                    this.currentEditingCredential = credential;
+
+                    // Populate form with actual credential data
+                    document.getElementById('credential-url').value = credential.url;
+                    document.getElementById('credential-username').value = credential.username;
+                    document.getElementById('credential-password').value = response.password; // Show actual password
+
+                    this.showCredentialModal();
+                    this.logResult('Edit form opened with actual password visible', 'success');
+
+                } catch (error) {
+                    console.error('Error opening edit form:', error);
+                    this.logResult(`Error opening edit form: ${error.message}`, 'error');
+                }
+            }
+
+            showMasterPasswordModal(message, context = 'general') {
+                return new Promise((resolve) => {
+                    this.masterPasswordResolve = resolve;
+                    document.getElementById('master-password-message').textContent = message;
+                    document.getElementById('modal-master-password').value = '';
+                    document.getElementById('master-password-modal').classList.add('show');
+                    document.getElementById('modal-master-password').focus();
+                });
+            }
+
+            hideMasterPasswordModal() {
+                document.getElementById('master-password-modal').classList.remove('show');
+                document.getElementById('modal-master-password').value = '';
+            }
+
+            showCredentialModal() {
+                document.getElementById('credential-modal').classList.add('show');
+                document.getElementById('credential-url').focus();
+            }
+
+            hideCredentialModal() {
+                // Clear sensitive password data from form fields for security
+                document.getElementById('credential-password').value = '';
+                document.getElementById('credential-url').value = '';
+                document.getElementById('credential-username').value = '';
+
+                document.getElementById('credential-modal').classList.remove('show');
+                this.currentEditingCredential = null;
+                this.logResult('Edit form closed and password data cleared', 'info');
+            }
+
+            handleCredentialSubmit() {
+                const url = document.getElementById('credential-url').value;
+                const username = document.getElementById('credential-username').value;
+                const password = document.getElementById('credential-password').value;
+
+                this.logResult(`Form submitted with: URL=${url}, Username=${username}, Password=${password}`, 'success');
+                this.hideCredentialModal();
+            }
+
+            logResult(message, type = 'info') {
+                const container = document.getElementById('test-results');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${type}`;
+                messageDiv.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+                container.appendChild(messageDiv);
+                container.scrollTop = container.scrollHeight;
+            }
+        }
+
+        // Initialize the test controller
+        document.addEventListener('DOMContentLoaded', () => {
+            window.testController = new TestPopupController();
+            
+            // Add test instructions
+            const instructions = document.createElement('div');
+            instructions.className = 'message';
+            instructions.innerHTML = `
+                <strong>Test Instructions:</strong><br>
+                1. Click "Edit" on any credential<br>
+                2. Enter "correct-password" as master password to see success flow<br>
+                3. Enter any other password to see error flow<br>
+                4. Check that actual password is shown in edit form when verification succeeds<br>
+                5. Check that form data is cleared when modal is closed
+            `;
+            document.getElementById('test-results').appendChild(instructions);
+        });
+    </script>
+</body>
+</html>

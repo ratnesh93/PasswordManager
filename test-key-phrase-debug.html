@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Key Phrase Debug Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .debug-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-step {
+            background-color: #e7f3ff;
+            border-left: 4px solid #0066cc;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .debug-output {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        button {
+            background-color: #007cba;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #005a8b;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            color: #856404;
+        }
+        .success {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 15px 0;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-container">
+        <h1>🔍 Key Phrase Confirmation Debug</h1>
+        <p>This page will help you debug the key phrase confirmation bypass issue.</p>
+        
+        <div class="warning">
+            <h3>⚠️ Debug Instructions</h3>
+            <ol>
+                <li>Open the Chrome extension and create a new account</li>
+                <li>When the key phrase appears, <strong>DO NOT</strong> check the confirmation checkbox</li>
+                <li>Switch to this tab (Alt+Tab or click this tab)</li>
+                <li>Click the "Check Extension State" button below</li>
+                <li>Switch back to the extension tab</li>
+                <li>Check what happens - it should still show the key phrase</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="debug-container">
+        <h2>🧪 Debug Tools</h2>
+        
+        <div class="test-step">
+            <h3>Step 1: Check Current SessionStorage State</h3>
+            <p>This will show what's stored in sessionStorage for the extension:</p>
+            <button onclick="checkSessionStorage()">Check SessionStorage</button>
+            <div id="sessionStorage-output" class="debug-output"></div>
+        </div>
+
+        <div class="test-step">
+            <h3>Step 2: Simulate Key Phrase Creation</h3>
+            <p>This will simulate creating a key phrase in sessionStorage:</p>
+            <button onclick="simulateKeyPhrase()">Simulate Key Phrase</button>
+            <button onclick="simulateConfirmation()">Simulate Confirmation</button>
+            <button onclick="clearKeyPhraseData()">Clear Key Phrase Data</button>
+            <div id="simulate-output" class="debug-output"></div>
+        </div>
+
+        <div class="test-step">
+            <h3>Step 3: Check Extension State</h3>
+            <p>This will check the current state of the extension popup:</p>
+            <button onclick="checkExtensionState()">Check Extension State</button>
+            <div id="extension-output" class="debug-output"></div>
+        </div>
+
+        <div class="test-step">
+            <h3>Step 4: Monitor Changes</h3>
+            <p>This will continuously monitor sessionStorage changes:</p>
+            <button onclick="startMonitoring()">Start Monitoring</button>
+            <button onclick="stopMonitoring()">Stop Monitoring</button>
+            <div id="monitoring-output" class="debug-output"></div>
+        </div>
+    </div>
+
+    <div class="debug-container">
+        <h2>📋 Expected Behavior</h2>
+        
+        <div class="success">
+            <h3>✅ Correct Behavior:</h3>
+            <ul>
+                <li>After creating account, key phrase should be displayed</li>
+                <li>Switching tabs should NOT bypass the confirmation</li>
+                <li>Extension should still show key phrase when reopened</li>
+                <li>Checkbox should be unchecked</li>
+                <li>Continue button should be disabled</li>
+                <li>Only after checking the box and clicking continue should main interface appear</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <h3>🐛 Bug Behavior:</h3>
+            <ul>
+                <li>After creating account, key phrase is displayed</li>
+                <li>Switching tabs and returning shows main interface directly</li>
+                <li>Key phrase confirmation is bypassed</li>
+                <li>User can access password manager without confirming backup</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let monitoringInterval = null;
+
+        function checkSessionStorage() {
+            const output = document.getElementById('sessionStorage-output');
+            let result = 'SessionStorage Contents:\\n';
+            
+            try {
+                const pendingKeyPhrase = sessionStorage.getItem('pendingKeyPhrase');
+                const keyPhraseConfirmed = sessionStorage.getItem('keyPhraseConfirmed');
+                
+                result += `pendingKeyPhrase: ${pendingKeyPhrase ? 'EXISTS (length: ' + pendingKeyPhrase.length + ')' : 'NULL'}\\n`;
+                result += `keyPhraseConfirmed: ${keyPhraseConfirmed || 'NULL'}\\n`;
+                
+                if (pendingKeyPhrase) {
+                    try {
+                        const parsed = JSON.parse(pendingKeyPhrase);
+                        result += `Parsed key phrase: ${Array.isArray(parsed) ? parsed.length + ' words' : 'Invalid format'}\\n`;
+                    } catch (e) {
+                        result += `Key phrase parse error: ${e.message}\\n`;
+                    }
+                }
+                
+                result += `\\nAll sessionStorage keys:\\n`;
+                for (let i = 0; i < sessionStorage.length; i++) {
+                    const key = sessionStorage.key(i);
+                    const value = sessionStorage.getItem(key);
+                    result += `${key}: ${value ? value.substring(0, 50) + (value.length > 50 ? '...' : '') : 'NULL'}\\n`;
+                }
+                
+            } catch (error) {
+                result += `Error: ${error.message}\\n`;
+            }
+            
+            output.textContent = result;
+        }
+
+        function simulateKeyPhrase() {
+            const output = document.getElementById('simulate-output');
+            try {
+                // Create a fake 16-word key phrase
+                const fakeKeyPhrase = [
+                    'abandon', 'ability', 'able', 'about', 'above', 'absent', 'absorb', 'abstract',
+                    'absurd', 'abuse', 'access', 'accident', 'account', 'accuse', 'achieve', 'acid'
+                ];
+                
+                sessionStorage.setItem('pendingKeyPhrase', JSON.stringify(fakeKeyPhrase));
+                sessionStorage.removeItem('keyPhraseConfirmed'); // Ensure not confirmed
+                
+                output.textContent = 'Simulated key phrase created in sessionStorage\\n' +
+                    'pendingKeyPhrase: SET (16 words)\\n' +
+                    'keyPhraseConfirmed: REMOVED\\n\\n' +
+                    'Now switch to the extension tab to see if it shows the key phrase.';
+            } catch (error) {
+                output.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        function simulateConfirmation() {
+            const output = document.getElementById('simulate-output');
+            try {
+                sessionStorage.setItem('keyPhraseConfirmed', 'true');
+                sessionStorage.removeItem('pendingKeyPhrase');
+                
+                output.textContent = 'Simulated key phrase confirmation\\n' +
+                    'keyPhraseConfirmed: true\\n' +
+                    'pendingKeyPhrase: REMOVED\\n\\n' +
+                    'Now switch to the extension tab to see if it shows the main interface.';
+            } catch (error) {
+                output.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        function clearKeyPhraseData() {
+            const output = document.getElementById('simulate-output');
+            try {
+                sessionStorage.removeItem('pendingKeyPhrase');
+                sessionStorage.removeItem('keyPhraseConfirmed');
+                
+                output.textContent = 'Cleared all key phrase data from sessionStorage\\n' +
+                    'pendingKeyPhrase: REMOVED\\n' +
+                    'keyPhraseConfirmed: REMOVED';
+            } catch (error) {
+                output.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        function checkExtensionState() {
+            const output = document.getElementById('extension-output');
+            let result = 'Extension State Check:\\n';
+            
+            try {
+                // Check if we can access the extension's popup
+                result += 'Checking sessionStorage state...\\n';
+                
+                const pendingKeyPhrase = sessionStorage.getItem('pendingKeyPhrase');
+                const keyPhraseConfirmed = sessionStorage.getItem('keyPhraseConfirmed');
+                
+                result += `pendingKeyPhrase: ${pendingKeyPhrase ? 'EXISTS' : 'NULL'}\\n`;
+                result += `keyPhraseConfirmed: ${keyPhraseConfirmed || 'NULL'}\\n`;
+                
+                // Determine expected behavior
+                result += '\\nExpected Extension Behavior:\\n';
+                if (pendingKeyPhrase && !keyPhraseConfirmed) {
+                    result += '✅ Should show KEY PHRASE confirmation screen\\n';
+                    result += '✅ Should NOT allow access to main interface\\n';
+                } else if (keyPhraseConfirmed) {
+                    result += '✅ Should show MAIN INTERFACE (if authenticated)\\n';
+                    result += '✅ Should NOT show key phrase\\n';
+                } else {
+                    result += '✅ Should show LOGIN/SIGNUP screen\\n';
+                }
+                
+                result += '\\nTo test: Switch to extension tab and verify the behavior matches the expectation above.';
+                
+            } catch (error) {
+                result += `Error: ${error.message}\\n`;
+            }
+            
+            output.textContent = result;
+        }
+
+        function startMonitoring() {
+            if (monitoringInterval) {
+                stopMonitoring();
+            }
+            
+            const output = document.getElementById('monitoring-output');
+            output.textContent = 'Monitoring sessionStorage changes...\\n\\n';
+            
+            let lastState = {
+                pendingKeyPhrase: sessionStorage.getItem('pendingKeyPhrase'),
+                keyPhraseConfirmed: sessionStorage.getItem('keyPhraseConfirmed')
+            };
+            
+            monitoringInterval = setInterval(() => {
+                const currentState = {
+                    pendingKeyPhrase: sessionStorage.getItem('pendingKeyPhrase'),
+                    keyPhraseConfirmed: sessionStorage.getItem('keyPhraseConfirmed')
+                };
+                
+                let changed = false;
+                let changes = '';
+                
+                if (currentState.pendingKeyPhrase !== lastState.pendingKeyPhrase) {
+                    changes += `pendingKeyPhrase: ${lastState.pendingKeyPhrase || 'NULL'} → ${currentState.pendingKeyPhrase || 'NULL'}\\n`;
+                    changed = true;
+                }
+                
+                if (currentState.keyPhraseConfirmed !== lastState.keyPhraseConfirmed) {
+                    changes += `keyPhraseConfirmed: ${lastState.keyPhraseConfirmed || 'NULL'} → ${currentState.keyPhraseConfirmed || 'NULL'}\\n`;
+                    changed = true;
+                }
+                
+                if (changed) {
+                    const timestamp = new Date().toLocaleTimeString();
+                    output.textContent += `[${timestamp}] Changes detected:\\n${changes}\\n`;
+                    output.scrollTop = output.scrollHeight;
+                    lastState = currentState;
+                }
+            }, 500);
+        }
+
+        function stopMonitoring() {
+            if (monitoringInterval) {
+                clearInterval(monitoringInterval);
+                monitoringInterval = null;
+                
+                const output = document.getElementById('monitoring-output');
+                output.textContent += '\\nMonitoring stopped.';
+            }
+        }
+
+        // Auto-check sessionStorage on page load
+        window.addEventListener('load', () => {
+            setTimeout(checkSessionStorage, 500);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chrome Password Manager</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Skip link for accessibility -->
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+        
+        <div id="loading" class="hidden" role="status" aria-live="polite">
+            <div class="loading-spinner" aria-hidden="true"></div>
+            <p>Loading...</p>
+        </div>
+        
+        <!-- Authentication Container -->
+        <div id="auth-container">
+            <div class="auth-header">
+                <h1>Password Manager</h1>
+                <p class="auth-subtitle">Secure your passwords with Gmail authentication</p>
+            </div>
+            
+            <!-- Initial Auth Choice -->
+            <div id="auth-choice" class="auth-section">
+                <button id="show-login" class="auth-choice-btn">
+                    <span class="btn-icon">🔑</span>
+                    <span class="btn-text">Login</span>
+                </button>
+                <button id="show-signup" class="auth-choice-btn">
+                    <span class="btn-icon">✨</span>
+                    <span class="btn-text">Sign Up</span>
+                </button>
+            </div>
+            
+            <!-- Login Form -->
+            <div id="login-form" class="auth-section hidden">
+                <div class="form-header">
+                    <h2>Welcome Back</h2>
+                    <p>Enter your master password to access your passwords</p>
+                </div>
+                
+                <div class="input-group">
+                    <label for="master-password">Master Password</label>
+                    <div class="password-input-wrapper">
+                        <input type="password" id="master-password" placeholder="Enter your master password" autocomplete="current-password">
+                        <button type="button" id="toggle-master-password" class="password-toggle" aria-label="Toggle password visibility">
+                            <span class="eye-icon">👁️</span>
+                        </button>
+                    </div>
+                    <div id="master-password-error" class="error-message hidden"></div>
+                </div>
+                
+                <div class="form-actions">
+                    <button id="login-submit" class="primary-btn">
+                        <span>Login</span>
+                    </button>
+                    <button id="back-to-choice" class="secondary-btn">Back</button>
+                </div>
+                
+                <div class="auth-footer">
+                    <p>Don't have an account? <button id="switch-to-signup" class="link-btn">Sign up</button></p>
+                </div>
+            </div>
+            
+            <!-- Signup Form -->
+            <div id="signup-form" class="auth-section hidden">
+                <div class="form-header">
+                    <h2>Create Account</h2>
+                    <p>Set up your secure password manager</p>
+                </div>
+                
+                <div class="input-group">
+                    <label for="new-master-password">Create Master Password</label>
+                    <div class="password-input-wrapper">
+                        <input type="password" id="new-master-password" placeholder="Create a strong master password" autocomplete="new-password">
+                        <button type="button" id="toggle-new-master-password" class="password-toggle" aria-label="Toggle password visibility">
+                            <span class="eye-icon">👁️</span>
+                        </button>
+                    </div>
+                    <div class="password-requirements">
+                        <p>Password must contain:</p>
+                        <ul id="password-requirements-list">
+                            <li id="req-length" class="requirement">At least 8 characters</li>
+                            <li id="req-uppercase" class="requirement">One uppercase letter</li>
+                            <li id="req-lowercase" class="requirement">One lowercase letter</li>
+                            <li id="req-number" class="requirement">One number</li>
+                        </ul>
+                    </div>
+                    <div id="new-master-password-error" class="error-message hidden"></div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="confirm-master-password">Confirm Master Password</label>
+                    <div class="password-input-wrapper">
+                        <input type="password" id="confirm-master-password" placeholder="Confirm your master password" autocomplete="new-password">
+                        <button type="button" id="toggle-confirm-password" class="password-toggle" aria-label="Toggle password visibility">
+                            <span class="eye-icon">👁️</span>
+                        </button>
+                    </div>
+                    <div id="confirm-password-error" class="error-message hidden"></div>
+                </div>
+                
+                <div class="form-actions">
+                    <button id="signup-submit" class="primary-btn" disabled>
+                        <span>Create Account</span>
+                    </button>
+                    <button id="back-to-choice" class="secondary-btn">Back</button>
+                </div>
+                
+                <div class="auth-footer">
+                    <p>Already have an account? <button id="switch-to-login" class="link-btn">Login</button></p>
+                </div>
+            </div>
+            
+            <!-- Key Phrase Display -->
+            <div id="key-phrase-display" class="auth-section hidden">
+                <div class="form-header">
+                    <h2>🔐 Your Recovery Key Phrase</h2>
+                    <p class="key-phrase-warning">
+                        <strong>Important:</strong> Save this 16-word key phrase securely. 
+                        You'll need it to import your passwords on other devices.
+                    </p>
+                </div>
+                
+                <div class="key-phrase-container">
+                    <div id="key-phrase-words" class="key-phrase-grid"></div>
+                    
+                    <div class="key-phrase-actions">
+                        <button id="copy-key-phrase" class="primary-btn">
+                            <span class="btn-icon">📋</span>
+                            <span>Copy Key Phrase</span>
+                        </button>
+                        <button id="download-key-phrase" class="secondary-btn">
+                            <span class="btn-icon">💾</span>
+                            <span>Download as File</span>
+                        </button>
+                    </div>
+                    
+                    <div class="key-phrase-warning">
+                        <div class="warning-icon">⚠️</div>
+                        <p><strong>This key phrase will remain visible until you confirm you've saved it.</strong> You can safely switch tabs or close the popup - your key phrase will be here when you return.</p>
+                    </div>
+                </div>
+                
+                <div class="key-phrase-confirmation">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="key-phrase-saved" class="checkbox">
+                        <label for="key-phrase-saved">
+                            I have securely saved my key phrase and understand I cannot recover my passwords without it
+                        </label>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button id="confirm-key-phrase" class="primary-btn" disabled>
+                            <span>Continue to Password Manager</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Main Application Container -->
+        <div id="main-container" class="hidden">
+            <main id="main-content" tabindex="-1">
+                <div class="main-header">
+                    <h2>Password Manager</h2>
+                    <button id="logout-btn" class="logout-btn" title="Logout" aria-label="Logout from password manager">
+                        <span aria-hidden="true">🚪</span>
+                    </button>
+                </div>
+            
+            <!-- Search and Filter Section -->
+            <div class="search-section" role="search">
+                <div class="search-input-wrapper">
+                    <input type="text" id="search-credentials" placeholder="Search credentials..." class="search-input" aria-label="Search credentials">
+                    <span class="search-icon" aria-hidden="true">🔍</span>
+                </div>
+                <button id="clear-search" class="clear-search-btn hidden" title="Clear search" aria-label="Clear search">×</button>
+            </div>
+            
+            <!-- Add Credential Button -->
+            <button id="add-credential" class="add-credential-btn">
+                <span class="btn-icon">➕</span>
+                <span>Add New Credential</span>
+            </button>
+            
+            <!-- Credentials List -->
+            <div id="credentials-container">
+                <div id="credential-list" class="credential-list" role="list" aria-label="Saved credentials"></div>
+                <div id="no-credentials" class="no-credentials hidden" role="status">
+                    <div class="no-credentials-icon" aria-hidden="true">🔐</div>
+                    <h3>No credentials found</h3>
+                    <p>Add your first credential to get started</p>
+                </div>
+            </div>
+            
+            <!-- Permissions Section -->
+            <div id="permissions-section" class="permissions-section hidden">
+                <div class="permissions-header">
+                    <h3>🔐 Extension Permissions</h3>
+                    <p>Manage permissions for enhanced functionality</p>
+                </div>
+                
+                <div class="permission-item">
+                    <div class="permission-info">
+                        <div class="permission-title">Autofill & Form Detection</div>
+                        <div class="permission-description">Allow the extension to detect login forms and autofill credentials</div>
+                    </div>
+                    <div class="permission-status">
+                        <span id="autofill-status" class="status-badge">Checking...</span>
+                        <button id="request-autofill" class="permission-btn hidden">Enable</button>
+                    </div>
+                </div>
+                
+                <div class="permission-actions">
+                    <button id="refresh-permissions" class="secondary-btn">
+                        <span class="btn-icon">🔄</span>
+                        <span>Refresh Status</span>
+                    </button>
+                    <button id="close-permissions" class="secondary-btn">Close</button>
+                </div>
+            </div>
+
+            <!-- Bottom Menu -->
+            <div class="bottom-menu">
+                <button id="export-btn" class="menu-btn">
+                    <span class="btn-icon">📤</span>
+                    <span>Export</span>
+                </button>
+                <button id="import-btn" class="menu-btn">
+                    <span class="btn-icon">📥</span>
+                    <span>Import</span>
+                </button>
+                <button id="permissions-btn" class="menu-btn">
+                    <span class="btn-icon">🔐</span>
+                    <span>Permissions</span>
+                </button>
+                <button id="delete-account-btn" class="menu-btn danger-btn">
+                    <span class="btn-icon">🗑️</span>
+                    <span>Delete Account</span>
+                </button>
+            </div>
+            </main>
+        </div>
+        
+        <!-- Add/Edit Credential Modal -->
+        <div id="credential-modal" class="modal hidden" role="dialog" aria-labelledby="modal-title" aria-modal="true">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modal-title">Add New Credential</h3>
+                    <button id="close-modal" class="close-btn" aria-label="Close modal">×</button>
+                </div>
+                
+                <form id="credential-form" class="credential-form">
+                    <div class="input-group">
+                        <label for="credential-url">Website/Service Name</label>
+                        <input type="text" id="credential-url" placeholder="example.com or Service Name" required>
+                        <div id="url-error" class="error-message hidden"></div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="credential-username">Username/Email</label>
+                        <input type="text" id="credential-username" placeholder="your@email.com" required>
+                        <div id="username-error" class="error-message hidden"></div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="credential-password">Password</label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="credential-password" placeholder="Enter password" required>
+                            <button type="button" id="toggle-credential-password" class="password-toggle" aria-label="Toggle password visibility">
+                                <span class="eye-icon">👁️</span>
+                            </button>
+                        </div>
+                        <div class="password-actions">
+                            <button type="button" id="generate-password" class="generate-btn">
+                                <span class="btn-icon">🎲</span>
+                                <span>Generate Strong Password</span>
+                            </button>
+                        </div>
+                        <div id="password-error" class="error-message hidden"></div>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" id="cancel-credential" class="secondary-btn">Cancel</button>
+                        <button type="submit" id="save-credential" class="primary-btn">
+                            <span id="save-btn-text">Save Credential</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Delete Confirmation Modal -->
+        <div id="delete-modal" class="modal hidden" role="dialog" aria-labelledby="delete-modal-title" aria-modal="true">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="delete-modal-title">Delete Credential</h3>
+                </div>
+                
+                <div class="delete-content">
+                    <div class="warning-icon">⚠️</div>
+                    <p>Are you sure you want to delete this credential?</p>
+                    <div class="credential-preview">
+                        <div class="preview-url" id="delete-preview-url"></div>
+                        <div class="preview-username" id="delete-preview-username"></div>
+                    </div>
+                    <p class="warning-text">This action cannot be undone.</p>
+                </div>
+                
+                <div class="modal-actions">
+                    <button id="cancel-delete" class="secondary-btn">Cancel</button>
+                    <button id="confirm-delete" class="danger-btn">
+                        <span>Delete Credential</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Export Modal -->
+        <div id="export-modal" class="modal hidden" role="dialog" aria-labelledby="export-modal-title" aria-modal="true">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="export-modal-title">Export Passwords</h3>
+                    <button id="close-export-modal" class="close-btn" aria-label="Close modal">×</button>
+                </div>
+                
+                <div class="export-content">
+                    <div class="export-info">
+                        <div class="info-icon">📤</div>
+                        <p>Export your encrypted password data to a secure file. You'll need your 16-word key phrase to decrypt this file later.</p>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="export-key-phrase">Enter your 16-word key phrase</label>
+                        <textarea id="export-key-phrase" placeholder="Enter your 16-word key phrase separated by spaces" rows="3" required></textarea>
+                        <div class="key-phrase-help">
+                            <small>This is the key phrase you saved when creating your account. It's needed to encrypt your export file.</small>
+                        </div>
+                        <div id="export-key-phrase-error" class="error-message hidden"></div>
+                    </div>
+                    
+                    <div class="export-options">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="include-passwords" class="checkbox" checked>
+                            <label for="include-passwords">Include passwords in export (recommended)</label>
+                        </div>
+                    </div>
+                    
+                    <div class="export-progress hidden" id="export-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <p class="progress-text">Encrypting and preparing your data...</p>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button id="cancel-export" class="secondary-btn">Cancel</button>
+                    <button id="start-export" class="primary-btn">
+                        <span class="btn-icon">📤</span>
+                        <span>Export Data</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Import Modal -->
+        <div id="import-modal" class="modal hidden" role="dialog" aria-labelledby="import-modal-title" aria-modal="true">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="import-modal-title">Import Passwords</h3>
+                    <button id="close-import-modal" class="close-btn" aria-label="Close modal">×</button>
+                </div>
+                
+                <div class="import-content">
+                    <div class="import-info">
+                        <div class="info-icon">📥</div>
+                        <p>Import your encrypted password data from a previously exported file. This will merge with your existing passwords.</p>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="import-file">Select export file</label>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="import-file" accept=".json,.txt" required>
+                            <div class="file-input-display">
+                                <span class="file-icon">📁</span>
+                                <span id="file-name">No file selected</span>
+                            </div>
+                        </div>
+                        <div id="import-file-error" class="error-message hidden"></div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="import-key-phrase">Enter your 16-word key phrase</label>
+                        <textarea id="import-key-phrase" placeholder="Enter the 16-word key phrase used to encrypt this file" rows="3" required></textarea>
+                        <div class="key-phrase-help">
+                            <small>This must be the same key phrase that was used when exporting this file.</small>
+                        </div>
+                        <div id="import-key-phrase-error" class="error-message hidden"></div>
+                    </div>
+                    
+                    <div class="import-preview hidden" id="import-preview">
+                        <h4>Import Preview</h4>
+                        <div class="preview-stats">
+                            <div class="stat-item">
+                                <span class="stat-number" id="preview-count">0</span>
+                                <span class="stat-label">credentials found</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="preview-new">0</span>
+                                <span class="stat-label">new</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="preview-existing">0</span>
+                                <span class="stat-label">existing</span>
+                            </div>
+                        </div>
+                        <div class="import-options">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="overwrite-existing" class="checkbox">
+                                <label for="overwrite-existing">Overwrite existing credentials with same URL</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="import-progress hidden" id="import-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <p class="progress-text">Decrypting and importing your data...</p>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button id="cancel-import" class="secondary-btn">Cancel</button>
+                    <button id="preview-import" class="secondary-btn">
+                        <span class="btn-icon">👁️</span>
+                        <span>Preview</span>
+                    </button>
+                    <button id="start-import" class="primary-btn" disabled>
+                        <span class="btn-icon">📥</span>
+                        <span>Import Data</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Master Password Modal -->
+        <div id="master-password-modal" class="modal hidden" role="dialog" aria-labelledby="master-password-modal-title" aria-modal="true">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="master-password-modal-title">Master Password Required</h3>
+                </div>
+                
+                <div class="master-password-content">
+                    <p id="master-password-message">Please enter your master password to continue:</p>
+                    
+                    <div class="input-group">
+                        <label for="modal-master-password">Master Password</label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="modal-master-password" placeholder="Enter your master password" autocomplete="current-password">
+                            <button type="button" id="toggle-modal-master-password" class="password-toggle" aria-label="Toggle password visibility">
+                                <span class="eye-icon">👁️</span>
+                            </button>
+                        </div>
+                        <div id="modal-master-password-error" class="error-message hidden"></div>
+                        <div id="master-password-attempts" class="attempt-counter hidden"></div>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button id="cancel-master-password" class="secondary-btn">Cancel</button>
+                    <button id="continue-master-password" class="primary-btn">
+                        <span>Continue</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Delete Account Confirmation Modal -->
+        <div id="delete-account-modal" class="modal hidden" role="dialog" aria-labelledby="delete-account-modal-title" aria-modal="true">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="delete-account-modal-title">Delete Account</h3>
+                </div>
+                
+                <div class="delete-account-content">
+                    <div class="warning-icon">⚠️</div>
+                    <h4>This action cannot be undone!</h4>
+                    <p>Deleting your account will permanently remove:</p>
+                    <ul>
+                        <li>All saved passwords and credentials</li>
+                        <li>Your master password and encryption keys</li>
+                        <li>All exported data and backups</li>
+                        <li>Your account settings and preferences</li>
+                    </ul>
+                    
+                    <div class="input-group">
+                        <label for="delete-master-password">Enter your master password to confirm:</label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="delete-master-password" placeholder="Enter master password" required>
+                            <button type="button" id="toggle-delete-password" class="password-toggle" aria-label="Toggle password visibility">
+                                <span class="eye-icon">👁️</span>
+                            </button>
+                        </div>
+                        <div id="delete-master-password-error" class="error-message hidden"></div>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="confirm-delete-account" class="checkbox">
+                        <label for="confirm-delete-account">
+                            I understand this action is permanent and cannot be undone
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button id="cancel-delete-account" class="secondary-btn">Cancel</button>
+                    <button id="confirm-delete-account-btn" class="danger-btn" disabled>
+                        <span>Delete Account Permanently</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>
