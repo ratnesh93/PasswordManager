@@ -73,7 +73,7 @@ The basic project structure is now complete. The next tasks will implement:
 2. UI functionality and aesthetic improvement.
 3. Bug Fixes.
 
-## Sampple UI Images
+## Sample UI Images
 
 ![Login Page](./images/login.png)
 ![Sign Up Page](./images/signup.png)
