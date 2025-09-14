@@ -21,7 +21,6 @@ A secure local password manager Chrome extension with Gmail authentication and e
 
 ## Features
 
-- Gmail OAuth authentication
 - Master password protection
 - Local encrypted storage
 - Right-click context menu integration
@@ -50,25 +49,42 @@ A secure local password manager Chrome extension with Gmail authentication and e
 ## Requirements Covered
 
 This basic structure addresses all requirements by providing:
-- Credential storage interface 
-- Context menu integration
-- Import/export framework 
-- Encryption service foundation
-- Local storage for offline use 
-- Autofill feature
-- Save to Password manager feature from website login page
+ - Create Account/signup using Master Password
+ - 16-word Engligh key phrase geerator using BIP39 word list at time of signup (Needed for import/export of credentials)
+ - Login using master password
+ - Manual addition of new credentials, user input: website, username and password and saving done by re-authentication with master password.
+ - Updating/Editing existing credentials by re-authenticating with master password
+ - Copying/retrieving existing saved password by re-authenticating with master password.
+ - Viewing existing saved password by re-authenticating with master password.
+ - Searching exisitng creds in the search bar.
+ - Exporting encrypted credentials in .json file by entering the 16-word English key phrase(generated at time of signup)
+ - Session management and timeout. 
+ - Manual Logout option and auto-logout on browser closer or timeout and with proper cleanup
+ - Account Delete option.
+ - Manage permissions option to enable scripting and activeTab permission
+ - Autofill username and password in existing url from saved credentials from password manager. 
+ - Save creds to password manager by right click menu context. 
+ - Importing .json encrypted credentials file.
 
 ## Next Steps
 
 The basic project structure is now complete. The next tasks will implement:
 1. Import Functionality.
-2. Right-click context menu integration for enhanced usability across websites.
-3. Automatic form detection and autofill.
-4. UI functionality and aesthetic improvement.
+2. UI functionality and aesthetic improvement.
+3. Bug Fixes.
 
-## Notes
+## Sampple UI Images
 
-- This is a Manifest V3 extension using service workers
-- All placeholder functionality is marked with console.log statements
-- Real implementation will replace mock data with actual encryption and storage
-- OAuth client ID needs to be configured for Gmail authentication
+![Login Page](./images/login.png)
+![Sign Up Page](./images/signup.png)
+![16 word recovery key generation Page](./images/recoverykey.png)
+![Export Recovery key option](./images/exportRecoveryKey.png)
+![Dashboard for Password Manager](./images/dashboard.png)
+![Add new credentials page](./images/newCredential.png)
+![Master password popup page](./images/masterPassword.png)
+![Dashboard with creds](./images/dashboardWithCred.png)
+![Permission setting](./images/permission.png)
+![exporting the cred](./images/export.png)
+![Right-click context menu on any website](./images/contextMenu.png)
+![Autofill option for saved creds for website](./images/autofill.png)
+
