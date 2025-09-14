@@ -1,6 +1,6 @@
 # Chrome Password Manager Extension
 
-A secure local password manager Chrome extension with Gmail authentication and encrypted storage.
+A secure local password manager Chrome extension with Gmail authentication and encrypted storage. [The link to medium article](https://medium.com/@ratneshchandak/from-idea-to-production-creating-a-chrome-password-manager-using-kiros-ai-vibe-coding-3ad991cac134): 
 
 ## Project Structure
 
