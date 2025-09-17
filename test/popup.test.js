@@ -36,7 +36,7 @@ beforeEach(async () => {
                 <div id="auth-container">
                     <div class="auth-header">
                         <h1>Password Manager</h1>
-                        <p class="auth-subtitle">Secure your passwords with Gmail authentication</p>
+                        <p class="auth-subtitle">Secure your passwords with locally</p>
                     </div>
                     
                     <div id="auth-choice" class="auth-section">
